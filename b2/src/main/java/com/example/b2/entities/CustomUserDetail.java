@@ -1,22 +1,33 @@
 package com.example.b2.entities;
 
+import com.example.b2.repositories.IUserRepository;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CustomUserDetail implements UserDetails {
     private final User user;
+    private final IUserRepository userRepository;
 
+    public CustomUserDetail(User user,IUserRepository userRepository) {
 
-    public CustomUserDetail(User user) {
         this.user = user;
+        this.userRepository =userRepository;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+        String [] roles = userRepository.getRoleOfUser(user.getId());
+        for(String role : roles){
+            authorities.add((new SimpleGrantedAuthority(role)));
+        }
+        return authorities;
     }
 
     @Override

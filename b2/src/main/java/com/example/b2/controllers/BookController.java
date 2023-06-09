@@ -109,10 +109,11 @@ public class BookController {
     }
 
     @GetMapping("/delete/{id}")
+    @ResponseBody
     public String deleteBook(@PathVariable("id") Long id) {
       Book book=  bookService.findById(id);
         book.setDeleted(true);
         bookService.save(book);
-        return "redirect:/books";
+        return "1";
     }
 }

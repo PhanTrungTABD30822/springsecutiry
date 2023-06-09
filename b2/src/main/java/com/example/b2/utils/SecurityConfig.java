@@ -33,14 +33,14 @@ public class SecurityConfig {
     }
     @Bean
     public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
-        return http
+        return http.csrf().disable()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/", "/register", "/error")
                         .permitAll()
                         .requestMatchers("/books/edit", "/books/delete")
-                        .authenticated()
+                        .hasAnyAuthority("ADMIN")
                         .requestMatchers("/books", "/books/add")
-                        .authenticated()
+                        .hasAnyAuthority("ADMIN","USER")
                         .anyRequest().authenticated()
                 )
                 .logout(logout -> logout.logoutUrl("/logout")
@@ -52,7 +52,7 @@ public class SecurityConfig {
                 )
                 .formLogin(formLogin -> formLogin.loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/")
+                        .defaultSuccessUrl("/books")
                         .permitAll()
                 )
                 .rememberMe(rememberMe -> rememberMe.key("uniqueAndSecret")

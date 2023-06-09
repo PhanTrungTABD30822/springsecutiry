@@ -1,10 +1,12 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+                xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <th:block th:replace="layout :: link-css">
 
     </th:block>
@@ -25,7 +27,7 @@
             <th scope="col">Author</th>
             <th scope="col">Price</th>
             <th scope="col">Category</th>
-            <th scope="col">Action</th>
+            <th sec:authorize="hasAnyAuthority('ADMIN')">Action</th>
         </tr>
         </thead>
         <tbody>
@@ -35,10 +37,10 @@
             <td th:text="${book.author}"></td>
             <td th:text="${book.price}"></td>
             <td th:text="${book.category.name}"></td>
-            <td>
+            <td sec:authorize="hasAnyAuthority('ADMIN')">
                 <a th:href="@{/books/edit/{id}(id=${book.id})}">Edit</a> |
                 <a th:href="@{/books/delete/{id}(id=${book.id})}"
-                   onclick="return confirm('Are you sure?')">Delete</a>
+                   onclick="deleteBook(this);return false;" class="text-danger">Delete</a>
             </td>
         </tr>
         </tbody>
@@ -55,6 +57,24 @@
         </ul>
     </nav>
 </div>
+
+<script th:inline="javascript">
+    function deleteBook(link){
+        if(confirm('Are you sure')){
+            $.ajax({
+                url: $(link).attr('href'),
+                type: 'GET',
+                success: result =>{
+                    if(result != "1"){
+                        alert("Loi");
+                    }else{
+                        $(link).parent().parent().remove();
+                    }
+                }
+            });
+        }
+    }
+</script>
 <th:block th:replace="layout  :: footer"></th:block>
 </body>
 </html>
